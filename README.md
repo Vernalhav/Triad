@@ -1,4 +1,4 @@
-This project aims to make easier (?) to take notes in a tree-like manner!  
+This project aims to make it easier and more organized to take notes in a tree-like manner!  
   
   
 Requires Node.js and Express.  
