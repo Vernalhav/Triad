@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- Linking external CSS and JS files -->
+    <link rel="stylesheet" href="../css/style.css">
+    <script type="text/javascript" src="../js/triad.js"></script>
+</head>
+
+<body id="main_body">
+    <div>
+        <button onclick="toggleRemoving()">Remove</button>
+        
+        <input type="text" id="note_input" name="note" size=100 onkeydown="if (event.keyCode == 13) addNote()">
+    </div>
+
+    <p id="note_header">Notes:</p>
+
+    <div class="note">
+        <ul id="notes_list">
+
+        </ul>
+    </div>
+</body>
+</html>
