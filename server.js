@@ -69,20 +69,22 @@ function saveFile(args, response){
     // Writes file and creates notes directory if it doesn't exist
     fs.writeFile(filePath, s, "utf-8", (error)=>{
         if (error && error.code == "ENOENT"){
-            fs.mkdir(filePath, (error)=>{
+            fs.mkdir(NOTES_DIR, (error)=>{
                 if (error){
                     response.json({"status" : "Could not create notes directory"});
                     throw error;
                 }
 
                 fs.writeFile(filePath, s, "utf-8", (error)=>{
-                    response.json({"status" : "Could not write file"});
-                    throw error;
+                    if (error) {
+                        response.json({"status" : "Could not write file"});
+                        throw error;                        
+                    }
+                    response.json({"status" : MSG_SUCCESS});
                 });
-                response.json({"status" : MSG_SUCCESS});
             });
         }
-        response.json({"status" : MSG_SUCCESS});
+        else response.json({"status" : MSG_SUCCESS});
     });
 }
 
