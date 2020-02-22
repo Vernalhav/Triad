@@ -3,20 +3,44 @@ let removing = false;       // Whether removing notes or not
 let notesJSON = {};         // Object containing all notes
 let currentNoteStack = [];  // Path taken from root note to current note
 
+const FILENAME = "notes.json";
+
+// Future features
+//   Edit notes
+//   Name files/open new file
+
 
 function main(){
+    document.addEventListener("keydown", function(e){
+        // Captures CTRL+S event
+        if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)){
+            e.preventDefault();
+            saveFile();
+        }
+    }, false);
+}
 
+
+function saveFile(){
+    const requestJSON = {
+        "function" : "saveFile",
+        "args" : {
+            "name" : FILENAME,
+            "json" : notesJSON
+        }
+    };
+
+    sendJSON(requestJSON, ()=>console.log("File saved."));
 }
 
 
 function ignoreReply(){}
 
 
-function setupPreviousFile(){
+// TODO: write json to screen
+function setupPreviousFile(json){
     notesJSON = JSON.parse(this.response);
     if (Object.keys(notesJSON).length == 0) return;
-
-    
 }
 
 /*
@@ -25,17 +49,18 @@ function setupPreviousFile(){
     is available
 */
 function sendJSON(json, callback=ignoreReply){
-    const message_string = JSON.stringify(json);
+    const messageString = JSON.stringify(json);
 
-    var xml_request = new XMLHttpRequest();
-    xml_request.addEventListener("load", callback); // Calls callback when response is complete and reply available
-    xml_request.open("POST", "/");
-    xml_request.setRequestHeader("Content-Type", "application/json"); // Needs this so that express.json() recognizes it
+    var xmlRequest = new XMLHttpRequest();
+    xmlRequest.addEventListener("load", callback); // Calls callback when response is complete and reply available
+    xmlRequest.open("POST", "/");
+    xmlRequest.setRequestHeader("Content-Type", "application/json"); // Needs this so that express.json() recognizes it
     
-    xml_request.send(message_string);
+    xmlRequest.send(messageString);
 }
 
 
+// TODO: Traverse through the tree or remove text
 function textClicked(element){
     let text = element.target.childNodes[0].nodeValue;
     console.log(text);
@@ -48,7 +73,6 @@ function addNote(){
     let text = document.getElementById("note_input").value;
 
     if (text == "" || notesJSON[text] != undefined) return;
-    sendJSON({"text" : text});  // Sends JSON to server
 
     notesJSON[text] = {};
 
@@ -66,6 +90,7 @@ function addNote(){
     document.getElementById("note_input").value = "";
 }
 
+
 function toggleRemoving(){
     removing = !removing;
     let className = removing ? "removing" : "";
@@ -75,6 +100,7 @@ function toggleRemoving(){
     for (let i = 0; i < anchorList.length; i++)
         anchorList[i].className = className;
 }
+
 
 /*
     Updates the notes list HTML with
