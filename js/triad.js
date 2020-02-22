@@ -29,7 +29,7 @@ function saveFile(){
             "json" : notesJSON
         }
     };
-    
+
     sendJSON(requestJSON, ()=>console.log("File saved."));
 }
 
@@ -49,14 +49,14 @@ function setupPreviousFile(json){
     is available
 */
 function sendJSON(json, callback=ignoreReply){
-    const message_string = JSON.stringify(json);
+    const messageString = JSON.stringify(json);
 
-    var xml_request = new XMLHttpRequest();
-    xml_request.addEventListener("load", callback); // Calls callback when response is complete and reply available
-    xml_request.open("POST", "/");
-    xml_request.setRequestHeader("Content-Type", "application/json"); // Needs this so that express.json() recognizes it
+    var xmlRequest = new XMLHttpRequest();
+    xmlRequest.addEventListener("load", callback); // Calls callback when response is complete and reply available
+    xmlRequest.open("POST", "/");
+    xmlRequest.setRequestHeader("Content-Type", "application/json"); // Needs this so that express.json() recognizes it
     
-    xml_request.send(message_string);
+    xmlRequest.send(messageString);
 }
 
 
@@ -68,13 +68,11 @@ function textClicked(element){
 }
 
 
-// TODO: Send JSON to server to save
 function addNote(){
     let notesList = document.getElementById("notes_list");
     let text = document.getElementById("note_input").value;
 
     if (text == "" || notesJSON[text] != undefined) return;
-    sendJSON({"text" : text});  // Sends JSON to server
 
     notesJSON[text] = {};
 

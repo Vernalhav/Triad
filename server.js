@@ -1,5 +1,6 @@
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 
@@ -11,8 +12,8 @@ const server = app.listen(8000);
 app.use(express.json());    // Required to parse json POST requests
 
 app.post("/", function (request, response){
-    if (!request.body.hasOwnProperty("function")){
-        response.send({"status" : "Invalid JSON (no function property)"});
+    if (!hasProperties(request.body, ["function", "args"])){
+        response.send({"status" : "Invalid JSON (no function or args)"});
         return;
     }
 
@@ -22,10 +23,15 @@ app.post("/", function (request, response){
     switch(f){
         case "saveFile":
         console.log("Calling save function...");
+        const status = saveFile(request.body.args);
+        response.send(status);
         break;
 
         case "getFile":
         console.log("Calling get file function...");
+        const status = saveFile(request.body);
+        response.send(status);
+
         break;
 
         default:
@@ -44,9 +50,33 @@ app.post("/", function (request, response){
 
 */
 function saveFile(args){
+    if (!hasProperties(args, ["name", "json"]))
+        return {"status" : "Invalid JSON (missing function parameters)"};
 
+    const s = JSON.stringify(args.json, null, 4);
+    const filePath = path.join("notes", args.name);
+
+    // Writes file and creates notes directory if it doesn't exist
+    fs.writeFile(filePath, s, "utf-8", (error)=>{
+        if (error && error.code == "ENOENT"){
+            fs.mkdir(filePath, (error)=>{
+                if (error) throw error;
+                fs.writeFile(filePath, s, "utf-8", (error)=>{throw error})
+            });
+        }
+
+    });
+
+    return {"status" : "OK"};
 }
 
+
+/* Returns true if obj contains all properties. False otherwise */
+function hasProperties(obj, properties){
+    for (let i = 0; i < properties.length; i++)
+        if (!obj.hasOwnProperty(properties[i])) return false;
+    return true;
+}
 
 /*
     
