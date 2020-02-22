@@ -15,7 +15,6 @@ const server = app.listen(8000);
 app.use(express.json());    // Required to parse json POST requests
 
 app.post("/", function (request, response){
-    response.setContentType("application/json");
 
     if (!hasProperties(request.body, ["function", "args"])){
         response.json({"status" : "Invalid JSON (no function or args)"});

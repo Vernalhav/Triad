@@ -26,17 +26,27 @@ function main(){
 }
 
 
-function addNote(){
-    let notesList = document.getElementById("notes_list");
+function addNoteTextbox(){
     let text = document.getElementById("note_input").value;
+    if (notesJSON[text] != undefined) return;   // Skips adding duplicates
 
-    if (text == "" || notesJSON[text] != undefined) return;
+    addNote(text);
 
-    notesJSON[text] = {};
+    document.getElementById("note_input").value = "";   // Resets textbox
+    isSaved = false;
+}
+
+
+/* Adds non-empty string to the bottom of the notes list HTML  */
+function addNote(note){
+    if (note == "") return;
+
+    notesJSON[note] = {};
+    let notesList = document.getElementById("notes_list");
 
     let node = document.createElement("LI");
     let anchor = document.createElement("a");
-    let textnode = document.createTextNode(text);
+    let textnode = document.createTextNode(note);
     
     anchor.href = "javascript:;";
     anchor.onclick = textClicked;
@@ -44,9 +54,6 @@ function addNote(){
     anchor.appendChild(textnode);
     node.appendChild(anchor);
     notesList.appendChild(node);
-
-    document.getElementById("note_input").value = "";
-    isSaved = false;
 }
 
 
@@ -59,7 +66,6 @@ function requestNotes(name){
     };
 
     sendJSON(requestJSON, function(event){
-        console.log(event);
         let response = JSON.parse(event.target.response);
         if (response.status != MSG_SUCCESS) return;
 
@@ -88,11 +94,6 @@ function saveFile(){
 function ignoreReply(){}
 
 
-// TODO: write json to screen
-function setupPreviousFile(json){
-    if (Object.keys(notesJSON).length == 0) return;
-}
-
 /*
     Sends a json object to the server via a
     POST request. Calls callback when reply
@@ -114,10 +115,9 @@ function sendJSON(json, callback=ignoreReply){
 
 
 // TODO: Traverse through the tree or remove text
-function textClicked(element){
-    let text = element.target.childNodes[0].nodeValue;
+function textClicked(event){
+    let text = event.target.childNodes[0].nodeValue;
     console.log(text);
-
 }
 
 
@@ -139,11 +139,14 @@ function toggleRemoving(){
     json: json file whose keys are notes
 */
 function displayNotes(json){
-    console.log(json);
+
     let notesList = document.getElementById("notes_list");
      
     while (notesList.hasChildNodes())
         notesList.removeChild(notesList.childNodes[0]);
+
+    for (let key in json)
+        addNote(key);
 }
 
 
