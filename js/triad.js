@@ -28,7 +28,9 @@ function main(){
 
 function addNoteTextbox(){
     let text = document.getElementById("note_input").value;
-    if (notesJSON[text] != undefined) return;   // Skips adding duplicates
+    let currentJSON = traverseJSON(currentNoteStack);
+ 
+    if (currentJSON[text] != undefined) return;   // Skips adding duplicates
 
     addNote(text);
 
@@ -41,7 +43,12 @@ function addNoteTextbox(){
 function addNote(note){
     if (note == "") return;
 
-    notesJSON[note] = {};
+    let currentJSON = traverseJSON(currentNoteStack);
+    
+    // Create new "node" for the tree if the note is new.
+    if (currentJSON[note] == undefined)
+        currentJSON[note] = {};
+    
     let notesList = document.getElementById("notes_list");
 
     let node = document.createElement("LI");
@@ -69,7 +76,8 @@ function requestNotes(name){
         let response = JSON.parse(event.target.response);
         if (response.status != MSG_SUCCESS) return;
 
-        notesJSON = response.file;
+        Object.assign(notesJSON, response.file);
+
         displayNotes(notesJSON);
     });
 }
@@ -116,8 +124,51 @@ function sendJSON(json, callback=ignoreReply){
 
 // TODO: Traverse through the tree or remove text
 function textClicked(event){
-    let text = event.target.childNodes[0].nodeValue;
-    console.log(text);
+    let textNode = event.target.childNodes[0];
+    let text = textNode.nodeValue;
+
+    switch (textNode.className){
+        case "removing":
+        break;
+
+        case "editing":
+        break;
+
+        case "reordering":
+        break;
+
+        default:
+        currentNoteStack.push(text);
+        let textChildren = traverseJSON(currentNoteStack);
+
+        if (textChildren != null){
+            document.getElementById("note_header").innerText = text + ":";
+            displayNotes(textChildren);
+        } else {
+            currentNoteStack.pop();
+        }   
+    }
+}
+
+
+/*
+    Returns JSON resulting from
+    traversing 'json' through
+    'path' keys. Returns null if
+    path is invalid.
+
+    json:  json object to traverse
+    path:  array of keys to traverse
+*/
+function traverseJSON(path, json=notesJSON){
+    if (!hasProperties(json, path)) return null;
+
+    let traverseResult = json;
+    for (let i = 0; i < path.length; i++){
+        traverseResult = traverseResult[path[i]];
+    }
+
+    return traverseResult;
 }
 
 
@@ -147,6 +198,14 @@ function displayNotes(json){
 
     for (let key in json)
         addNote(key);
+}
+
+
+/* Returns true if obj contains all properties. False otherwise */
+function hasProperties(obj, properties){
+    for (let i = 0; i < properties.length; i++)
+        if (!obj.hasOwnProperty(properties[i])) return false;
+    return true;
 }
 
 

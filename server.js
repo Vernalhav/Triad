@@ -100,7 +100,7 @@ function saveFile(args, response){
     The response object should
     contain the following keys:
     - status: message indicating success (MSG_SUCCESS) or failure 
-    - file:   the relevant file
+    - file:   the relevant file in JSON format
 */
 function getFile(args, response){
     if (!hasProperties(args, ["name"])){
@@ -114,9 +114,11 @@ function getFile(args, response){
             response.json({"status" : "Could not read file. Maybe it doesn't exist."});
             return;
         }
+
+        let fileJSON = JSON.parse(data);
         response.json({
             "status" : MSG_SUCCESS,
-            "file" : JSON.parse(data)
+            "file" : fileJSON
         });
     });
 }
