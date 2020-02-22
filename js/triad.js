@@ -8,10 +8,6 @@ let currentNoteStack = [];  // Path taken from root note to current note
 const FILENAME = "notes.json";
 const MSG_SUCCESS = "OK";
 
-// Future features
-//   Edit notes
-//   Name files/open new file
-
 
 function main(){
     document.addEventListener("keydown", function(e){
@@ -26,6 +22,7 @@ function main(){
 }
 
 
+/* Adds user input as a note */
 function addNoteTextbox(){
     let text = document.getElementById("note_input").value;
     let currentJSON = traverseJSON(currentNoteStack);
@@ -39,7 +36,7 @@ function addNoteTextbox(){
 }
 
 
-/* Adds non-empty string to the bottom of the notes list HTML  */
+/* Adds non-empty string as a note */
 function addNote(note){
     if (note == "") return;
 
@@ -63,12 +60,32 @@ function addNote(note){
     notesList.appendChild(node);
 }
 
+/* Removes note from JSON and HTML */
+function removeNote(note, noteNode){
+    let currentJSON = traverseJSON(currentNoteStack);
 
-function requestNotes(name){
+    if (!currentJSON.hasOwnProperty(note)) return;
+
+    if (Object.keys(currentJSON[note]).length == 0 ||
+        confirm("Are you sure you want to delete \"" + note + "\"?")){
+        
+        delete currentJSON[note];
+        noteNode.parentElement.parentElement.removeChild(noteNode.parentElement);
+    }
+}
+
+
+/*
+    Gets JSON notes file from
+    server and displays them
+
+    name:   name of the file to fetch
+*/
+function requestNotes(name=FILENAME){
     const requestJSON = {
         "function" : "getFile",
         "args" : {
-            "name" : FILENAME
+            "name" : name
         }
     };
 
@@ -83,6 +100,7 @@ function requestNotes(name){
 }
 
 
+/* Sends request to save current JSON */
 function saveFile(){
     const requestJSON = {
         "function" : "saveFile",
@@ -122,13 +140,13 @@ function sendJSON(json, callback=ignoreReply){
 }
 
 
-// TODO: Traverse through the tree or remove text
 function textClicked(event){
-    let textNode = event.target.childNodes[0];
-    let text = textNode.nodeValue;
+    let textNode = event.target;
+    let text = textNode.innerText;
 
     switch (textNode.className){
         case "removing":
+        removeNote(text, textNode);
         break;
 
         case "editing":
