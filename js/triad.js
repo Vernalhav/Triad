@@ -1,9 +1,12 @@
 
+let isSaved = true;         // Whether document is up to date
 let removing = false;       // Whether removing notes or not
+
 let notesJSON = {};         // Object containing all notes
 let currentNoteStack = [];  // Path taken from root note to current note
 
 const FILENAME = "notes.json";
+const MSG_SUCCESS = "OK";
 
 // Future features
 //   Edit notes
@@ -18,6 +21,57 @@ function main(){
             saveFile();
         }
     }, false);
+
+    requestNotes(FILENAME);
+}
+
+
+function addNoteTextbox(){
+    let text = document.getElementById("note_input").value;
+    if (notesJSON[text] != undefined) return;   // Skips adding duplicates
+
+    addNote(text);
+
+    document.getElementById("note_input").value = "";   // Resets textbox
+    isSaved = false;
+}
+
+
+/* Adds non-empty string to the bottom of the notes list HTML  */
+function addNote(note){
+    if (note == "") return;
+
+    notesJSON[note] = {};
+    let notesList = document.getElementById("notes_list");
+
+    let node = document.createElement("LI");
+    let anchor = document.createElement("a");
+    let textnode = document.createTextNode(note);
+    
+    anchor.href = "javascript:;";
+    anchor.onclick = textClicked;
+
+    anchor.appendChild(textnode);
+    node.appendChild(anchor);
+    notesList.appendChild(node);
+}
+
+
+function requestNotes(name){
+    const requestJSON = {
+        "function" : "getFile",
+        "args" : {
+            "name" : FILENAME
+        }
+    };
+
+    sendJSON(requestJSON, function(event){
+        let response = JSON.parse(event.target.response);
+        if (response.status != MSG_SUCCESS) return;
+
+        notesJSON = response.file;
+        displayNotes(notesJSON);
+    });
 }
 
 
@@ -30,23 +84,23 @@ function saveFile(){
         }
     };
 
-    sendJSON(requestJSON, ()=>console.log("File saved."));
+    sendJSON(requestJSON, ()=>{
+        isSaved = true;
+        console.log("File saved.")
+    });
 }
 
 
 function ignoreReply(){}
 
 
-// TODO: write json to screen
-function setupPreviousFile(json){
-    notesJSON = JSON.parse(this.response);
-    if (Object.keys(notesJSON).length == 0) return;
-}
-
 /*
     Sends a json object to the server via a
     POST request. Calls callback when reply
-    is available
+    is available.
+    NOTE: Callback should not be an arrow
+          function because it overwrites
+          'this' to a global scope.
 */
 function sendJSON(json, callback=ignoreReply){
     const messageString = JSON.stringify(json);
@@ -61,33 +115,9 @@ function sendJSON(json, callback=ignoreReply){
 
 
 // TODO: Traverse through the tree or remove text
-function textClicked(element){
-    let text = element.target.childNodes[0].nodeValue;
+function textClicked(event){
+    let text = event.target.childNodes[0].nodeValue;
     console.log(text);
-
-}
-
-
-function addNote(){
-    let notesList = document.getElementById("notes_list");
-    let text = document.getElementById("note_input").value;
-
-    if (text == "" || notesJSON[text] != undefined) return;
-
-    notesJSON[text] = {};
-
-    let node = document.createElement("LI");
-    let anchor = document.createElement("a");
-    let textnode = document.createTextNode(text);
-    
-    anchor.href = "javascript:;";
-    anchor.onclick = textClicked;
-
-    anchor.appendChild(textnode);
-    node.appendChild(anchor);
-    notesList.appendChild(node);
-
-    document.getElementById("note_input").value = "";
 }
 
 
@@ -109,13 +139,15 @@ function toggleRemoving(){
     json: json file whose keys are notes
 */
 function displayNotes(json){
+
     let notesList = document.getElementById("notes_list");
      
     while (notesList.hasChildNodes())
         notesList.removeChild(notesList.childNodes[0]);
+
+    for (let key in json)
+        addNote(key);
 }
 
 
 main();
-
-
