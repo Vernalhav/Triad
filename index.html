@@ -9,13 +9,16 @@
 </head>
 
 <body id="main_body">
-    <div>
+    <div style="margin-bottom:20px">
         <button onclick="toggleRemoving()">Remove</button>
         
         <input type="text" id="note_input" name="note" size=100 onkeydown="if (event.keyCode == 13) addNoteTextbox()">
     </div>
 
-    <p id="note_header">Notes:</p>
+    <div id="note_header">
+        <a href="javascript:;" onclick="backwardTraversal()" class="return" id="return_arrow"></a>
+        <a href="javascript:;" onclick="backwardTraversal()" class="return" id="previous_note">Notes</a>
+    </div>
 
     <div class="note">
         <ul id="notes_list">

@@ -28,7 +28,9 @@ function main(){
 
 function addNoteTextbox(){
     let text = document.getElementById("note_input").value;
-    if (notesJSON[text] != undefined) return;   // Skips adding duplicates
+    let currentJSON = traverseJSON(currentNoteStack);
+ 
+    if (currentJSON[text] != undefined) return;   // Skips adding duplicates
 
     addNote(text);
 
@@ -41,7 +43,12 @@ function addNoteTextbox(){
 function addNote(note){
     if (note == "") return;
 
-    notesJSON[note] = {};
+    let currentJSON = traverseJSON(currentNoteStack);
+    
+    // Create new "node" for the tree if the note is new.
+    if (currentJSON[note] == undefined)
+        currentJSON[note] = {};
+    
     let notesList = document.getElementById("notes_list");
 
     let node = document.createElement("LI");
@@ -69,7 +76,8 @@ function requestNotes(name){
         let response = JSON.parse(event.target.response);
         if (response.status != MSG_SUCCESS) return;
 
-        notesJSON = response.file;
+        Object.assign(notesJSON, response.file);
+
         displayNotes(notesJSON);
     });
 }
@@ -116,8 +124,91 @@ function sendJSON(json, callback=ignoreReply){
 
 // TODO: Traverse through the tree or remove text
 function textClicked(event){
-    let text = event.target.childNodes[0].nodeValue;
-    console.log(text);
+    let textNode = event.target.childNodes[0];
+    let text = textNode.nodeValue;
+
+    switch (textNode.className){
+        case "removing":
+        break;
+
+        case "editing":
+        break;
+
+        case "reordering":
+        break;
+
+        default:
+        forwardTraversal(text);
+        break;
+    }
+}
+
+
+/*
+    Updates HTML to the child subtree
+    rooted in string 'note'.
+*/
+function forwardTraversal(note){
+    currentNoteStack.push(note);
+    let noteChildren = traverseJSON(currentNoteStack);
+
+    if (noteChildren != null){
+        document.getElementById("previous_note").innerText = note;
+        document.getElementById("return_arrow").innerText = "<";
+        displayNotes(noteChildren);
+    } else {
+        currentNoteStack.pop(); // Undoes invalid operation
+    }
+}
+
+
+/*
+    Updates HTML to
+    the parent subtree
+*/
+function backwardTraversal(){
+    if (currentNoteStack.length == 0) return;
+
+    let note = currentNoteStack.pop();
+    let noteParent = traverseJSON(currentNoteStack);
+
+    let noteParentText = "";
+    if (currentNoteStack.length != 0){
+        noteParentText = currentNoteStack[currentNoteStack.length - 1];
+        document.getElementById("return_arrow").innerText = "<";
+    }
+    else {
+        noteParentText = "Notes";
+        document.getElementById("return_arrow").innerText = "";
+    }
+
+    if (noteParent != null){
+        document.getElementById("previous_note").innerText = noteParentText;
+        displayNotes(noteParent);
+    } else {
+        currentNoteStack.push(note);    // Undoes invalid operation
+    }
+}
+
+
+/*
+    Returns JSON resulting from
+    traversing 'json' through
+    'path' keys. Returns null if
+    path is invalid.
+
+    json:  json object to traverse
+    path:  array of keys to traverse
+*/
+function traverseJSON(path, json=notesJSON){
+
+    let traverseResult = json;
+    for (let i = 0; i < path.length; i++){
+        traverseResult = traverseResult[path[i]];
+        if (traverseResult == undefined) return null;
+    }
+
+    return traverseResult;
 }
 
 
