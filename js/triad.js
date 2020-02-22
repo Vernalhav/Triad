@@ -138,15 +138,55 @@ function textClicked(event){
         break;
 
         default:
-        currentNoteStack.push(text);
-        let textChildren = traverseJSON(currentNoteStack);
+        forwardTraversal(text);
+        break;
+    }
+}
 
-        if (textChildren != null){
-            document.getElementById("note_header").innerText = text + ":";
-            displayNotes(textChildren);
-        } else {
-            currentNoteStack.pop();
-        }   
+
+/*
+    Updates HTML to the child subtree
+    rooted in string 'note'.
+*/
+function forwardTraversal(note){
+    currentNoteStack.push(note);
+    let noteChildren = traverseJSON(currentNoteStack);
+
+    if (noteChildren != null){
+        document.getElementById("previous_note").innerText = note;
+        document.getElementById("return_arrow").innerText = "<";
+        displayNotes(noteChildren);
+    } else {
+        currentNoteStack.pop(); // Undoes invalid operation
+    }
+}
+
+
+/*
+    Updates HTML to
+    the parent subtree
+*/
+function backwardTraversal(){
+    if (currentNoteStack.length == 0) return;
+
+    let note = currentNoteStack.pop();
+    let noteParent = traverseJSON(currentNoteStack);
+
+    let noteParentText = "";
+    if (currentNoteStack.length != 0){
+        noteParentText = currentNoteStack[currentNoteStack.length - 1];
+        document.getElementById("return_arrow").innerText = "<";
+    }
+    else {
+        noteParentText = "Notes";
+        document.getElementById("return_arrow").innerText = "";
+    }
+
+    if (noteParent != null){
+        document.getElementById("previous_note").innerText = noteParentText;
+        displayNotes(noteParent);
+    } else {
+        currentNoteStack.push(note);    // Undoes invalid operation
     }
 }
 
@@ -161,11 +201,11 @@ function textClicked(event){
     path:  array of keys to traverse
 */
 function traverseJSON(path, json=notesJSON){
-    if (!hasProperties(json, path)) return null;
 
     let traverseResult = json;
     for (let i = 0; i < path.length; i++){
         traverseResult = traverseResult[path[i]];
+        if (traverseResult == undefined) return null;
     }
 
     return traverseResult;
@@ -198,14 +238,6 @@ function displayNotes(json){
 
     for (let key in json)
         addNote(key);
-}
-
-
-/* Returns true if obj contains all properties. False otherwise */
-function hasProperties(obj, properties){
-    for (let i = 0; i < properties.length; i++)
-        if (!obj.hasOwnProperty(properties[i])) return false;
-    return true;
 }
 
 
