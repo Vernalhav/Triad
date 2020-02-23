@@ -6,6 +6,7 @@ let currentNoteStack = [];  // Path taken from root note to current note
 
 const FILENAME = "notes.json";
 const MSG_SUCCESS = "OK";
+const EDIT_ICON = "../assets/edit.png";
 
 
 function main(){
@@ -33,16 +34,27 @@ function addNote(note){
     
     let notesList = document.getElementById("notes_list");
 
+    let notesNode = createNote(note);
+    notesList.appendChild(notesNode);
+}
+
+
+/*
+    Returns HTML element to be appended
+    to the notes list as a <li> with text
+    as the string 'note'
+*/
+function createNote(note){
+
     let node = document.createElement("LI");
     let anchor = document.createElement("a");
     let textNode = document.createTextNode(note);
     
     anchor.classList.add("note");
 
-    let editIcon = document.createElement("a");
-    let editText = document.createTextNode("EDIT");
+    let editIcon = document.createElement("img");
 
-    editIcon.href = "javascript:;";
+    editIcon.src = EDIT_ICON;
     editIcon.classList.add("edit");
     editIcon.onclick = editClicked;
 
@@ -54,31 +66,34 @@ function addNote(note){
     anchor.appendChild(textNode);
     node.appendChild(anchor);
 
-    editIcon.appendChild(editText);
     node.appendChild(editIcon);
-
-    notesList.appendChild(node);
+    return node;
 }
 
 
 function editClicked(event){
+    let oldValue = event.target.parentElement.getElementsByClassName("note")[0].innerText;
+    let listItem = event.target.parentElement;
 
-}
+    let textBox = document.createElement("input");
+    textBox.setAttribute("type", "text");
+    textBox.setAttribute("size", "40");
+    textBox.setAttribute("value", oldValue);
 
+    textBox.onkeydown = function(event){
+        if (event.keyCode == 13 && event.target.value != ""){
+            let newText = event.target.value;
+            listItem.innerHTML = "";
+            listItem.appendChild(createNote(newText));
 
-function showEdit(event){
-    if (removing) return;
-    
-    let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
-    editIcon.style.display = "inline-block";
-}
+            let currentJSON = traverseJSON(currentNoteStack);
+            currentJSON[newText] = currentJSON[oldValue];
+            delete currentJSON[oldValue];
+        }
+    };
 
-
-function hideEdit(event){
-    setTimeout(()=>{
-        let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
-        editIcon.style.display = "";
-    }, 300);
+    listItem.innerHTML = "";
+    listItem.appendChild(textBox);
 }
 
 
@@ -273,6 +288,24 @@ function displayNotes(json){
 
     for (let key in json)
         addNote(key);
+}
+
+
+/* Shows edit icon on note hover */
+function showEdit(event){
+    if (removing) return;
+
+    let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
+    editIcon.style.display = "inline-block";
+}
+
+
+/* Hides edit icon after brief delay */
+function hideEdit(event){
+    setTimeout(()=>{
+        let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
+        editIcon.style.display = "";
+    }, 300);
 }
 
 
