@@ -139,6 +139,8 @@ function requestNotes(name=FILENAME){
 
 /* Sends request to save current JSON */
 function saveFile(){
+    if (isSaved) return;
+    
     const requestJSON = {
         "function" : "saveFile",
         "args" : {
