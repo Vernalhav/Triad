@@ -10,6 +10,8 @@ Made with the intent to learn JS/CSS/HTML and client/server interactions, as wel
 - Clone the repo into a directory  
   ``` $ git clone https://github.com/Vernalhav/Triad.git ```  
 - Run  
-  ``` $ npm install
-  $ node server.js ```
+  ```  
+  $ npm install  
+  $ node server.js
+  ```
 To get the server running. Then go to http://localhost:8000 and you should be good to go!
