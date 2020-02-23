@@ -1,0 +1,19 @@
+{
+  "name": "triad",
+  "version": "1.0.0",
+  "description": "Helpful tree-like note taking",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node server.js"
+  },
+  "author": "Victor Giovannoni",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vernalhav/Triad.git"
+  }
+}
