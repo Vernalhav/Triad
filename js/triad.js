@@ -1,4 +1,3 @@
-
 let isSaved = true;         // Whether document is up to date
 let removing = false;       // Whether removing notes or not
 
@@ -44,11 +43,13 @@ function addNote(note){
     let editText = document.createTextNode("EDIT");
 
     editIcon.href = "javascript:;";
+    editIcon.classList.add("edit");
     editIcon.onclick = editClicked;
-    editIcon.className = "edit";
 
     anchor.href = "javascript:;";
     anchor.onclick = textClicked;
+    anchor.onmouseover = showEdit;
+    anchor.onmouseout = hideEdit;
 
     anchor.appendChild(textNode);
     node.appendChild(anchor);
@@ -62,6 +63,22 @@ function addNote(note){
 
 function editClicked(event){
 
+}
+
+
+function showEdit(event){
+    if (removing) return;
+    
+    let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
+    editIcon.style.display = "inline-block";
+}
+
+
+function hideEdit(event){
+    setTimeout(()=>{
+        let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
+        editIcon.style.display = "";
+    }, 300);
 }
 
 
@@ -122,31 +139,9 @@ function saveFile(){
 }
 
 
-/*
-    Sends a json object to the server via a
-    POST request. Calls callback when reply
-    is available.
-    Callback should receive the event as a
-    parameter, and can access the server
-    response through event.target.response
-*/
-function sendJSON(json, callback=ignoreReply){
-    const messageString = JSON.stringify(json);
-
-    var xmlRequest = new XMLHttpRequest();
-    xmlRequest.addEventListener("load", callback); // Calls callback when response is complete and reply available
-    xmlRequest.open("POST", "/");
-    xmlRequest.setRequestHeader("Content-Type", "application/json"); // Needs this so that express.json() recognizes it
-    
-    xmlRequest.send(messageString);
-}
-
-
 function textClicked(event){
     let textNode = event.target;
     let text = textNode.innerText;
-
-    console.log(textNode.classList);
 
     if (textNode.classList.contains("removing")){
         removeNote(text, textNode);
@@ -281,7 +276,27 @@ function displayNotes(json){
 }
 
 
-main();
+/*
+    Sends a json object to the server via a
+    POST request. Calls callback when reply
+    is available.
+    Callback should receive the event as a
+    parameter, and can access the server
+    response through event.target.response
+*/
+function sendJSON(json, callback=ignoreReply){
+   const messageString = JSON.stringify(json);
+
+    var xmlRequest = new XMLHttpRequest();
+    xmlRequest.addEventListener("load", callback); // Calls callback when response is complete and reply available
+    xmlRequest.open("POST", "/");
+    xmlRequest.setRequestHeader("Content-Type", "application/json"); // Needs this so that express.json() recognizes it
+    
+    xmlRequest.send(messageString);
+}
 
 
 function ignoreReply(){}
+
+
+main();
