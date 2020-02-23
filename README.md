@@ -11,6 +11,7 @@ Made with the intent to learn JS/CSS/HTML and client/server interactions, as wel
   ``` $ git clone https://github.com/Vernalhav/Triad.git ```  
 - Run  
   ```  
+  $ cd Triad  
   $ npm install  
   $ node server.js
   ```
