@@ -22,20 +22,6 @@ function main(){
 }
 
 
-/* Adds user input as a note */
-function addNoteTextbox(){
-    let text = document.getElementById("note_input").value;
-    let currentJSON = traverseJSON(currentNoteStack);
- 
-    if (currentJSON[text] != undefined) return;   // Skips adding duplicates
-
-    addNote(text);
-
-    document.getElementById("note_input").value = "";   // Resets textbox
-    isSaved = false;
-}
-
-
 /* Adds non-empty string as a note */
 function addNote(note){
     if (note == "") return;
@@ -50,15 +36,34 @@ function addNote(note){
 
     let node = document.createElement("LI");
     let anchor = document.createElement("a");
-    let textnode = document.createTextNode(note);
+    let textNode = document.createTextNode(note);
     
+    anchor.classList.add("note");
+
+    let editIcon = document.createElement("a");
+    let editText = document.createTextNode("EDIT");
+
+    editIcon.href = "javascript:;";
+    editIcon.onclick = editClicked;
+    editIcon.className = "edit";
+
     anchor.href = "javascript:;";
     anchor.onclick = textClicked;
 
-    anchor.appendChild(textnode);
+    anchor.appendChild(textNode);
     node.appendChild(anchor);
+
+    editIcon.appendChild(editText);
+    node.appendChild(editIcon);
+
     notesList.appendChild(node);
 }
+
+
+function editClicked(event){
+
+}
+
 
 /* Removes note from JSON and HTML */
 function removeNote(note, noteNode){
@@ -112,21 +117,18 @@ function saveFile(){
 
     sendJSON(requestJSON, ()=>{
         isSaved = true;
-        console.log("File saved.")
+        console.log("File saved.");
     });
 }
-
-
-function ignoreReply(){}
 
 
 /*
     Sends a json object to the server via a
     POST request. Calls callback when reply
     is available.
-    NOTE: Callback should not be an arrow
-          function because it overwrites
-          'this' to a global scope.
+    Callback should receive the event as a
+    parameter, and can access the server
+    response through event.target.response
 */
 function sendJSON(json, callback=ignoreReply){
     const messageString = JSON.stringify(json);
@@ -144,20 +146,14 @@ function textClicked(event){
     let textNode = event.target;
     let text = textNode.innerText;
 
-    switch (textNode.className){
-        case "removing":
+    console.log(textNode.classList);
+
+    if (textNode.classList.contains("removing")){
         removeNote(text, textNode);
-        break;
-
-        case "editing":
-        break;
-
-        case "reordering":
-        break;
-
-        default:
+    } else if (textNode.classList.contains("reordering")){
+        console.log("NOT IMPLEMENTED");
+    } else {
         forwardTraversal(text);
-        break;
     }
 }
 
@@ -167,6 +163,8 @@ function textClicked(event){
     rooted in string 'note'.
 */
 function forwardTraversal(note){
+    removing = false;
+
     currentNoteStack.push(note);
     let noteChildren = traverseJSON(currentNoteStack);
 
@@ -186,6 +184,7 @@ function forwardTraversal(note){
 */
 function backwardTraversal(){
     if (currentNoteStack.length == 0) return;
+    removing = false;
 
     let note = currentNoteStack.pop();
     let noteParent = traverseJSON(currentNoteStack);
@@ -230,14 +229,37 @@ function traverseJSON(path, json=notesJSON){
 }
 
 
+/*
+    Changes each list element's class
+    to identify whether or not it is
+    being removed.
+*/
 function toggleRemoving(){
     removing = !removing;
-    let className = removing ? "removing" : "";
-    let notesList = document.getElementById("notes_list");
 
-    let anchorList = notesList.getElementsByTagName("a");
-    for (let i = 0; i < anchorList.length; i++)
-        anchorList[i].className = className;
+    let anchorList = document.querySelectorAll(".note");
+
+    if (removing){
+        for (let i = 0; i < anchorList.length; i++)
+            anchorList[i].classList.add("removing");
+    } else {
+        for (let i = 0; i < anchorList.length; i++)
+            anchorList[i].classList.remove("removing");
+    }
+}
+
+
+/* Adds user input as a note */
+function addNoteTextbox(){
+    let text = document.getElementById("note_input").value;
+    let currentJSON = traverseJSON(currentNoteStack);
+ 
+    if (currentJSON[text] != undefined) return;   // Skips adding duplicates
+
+    addNote(text);
+
+    document.getElementById("note_input").value = "";   // Resets textbox
+    isSaved = false;
 }
 
 
@@ -260,3 +282,6 @@ function displayNotes(json){
 
 
 main();
+
+
+function ignoreReply(){}

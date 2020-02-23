@@ -5,12 +5,20 @@
     white-space: normal;
 }
 
-.note {
+.notes {
     font-family: Helvetica;
     font-size: 25px;
     color: black;
 }
 
+.edit {
+    margin-left: 20px;
+    display: none;
+}
+
+.note:hover .edit {
+    display:inline-block;
+}
 
 a {
     text-decoration: none;
