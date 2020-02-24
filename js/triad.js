@@ -6,7 +6,7 @@ let currentNoteStack = [];  // Path taken from root note to current note
 
 const FILENAME = "notes.json";
 const MSG_SUCCESS = "OK";
-const EDIT_ICON = "../assets/edit.png";
+const EDIT_ICON = "edit.png";
 
 
 function main(){
