@@ -82,6 +82,8 @@ function editClicked(event){
 
     textBox.onkeydown = function(event){
         if (event.keyCode == 13 && event.target.value != ""){
+            isSaved = false;
+            
             let newText = event.target.value;
             listItem.innerHTML = "";
             listItem.appendChild(createNote(newText));
