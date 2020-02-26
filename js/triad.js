@@ -68,7 +68,7 @@ function createNote(note){
 
     node.appendChild(anchor);
     node.appendChild(editIcon);
-    
+
     return node;
 }
 
@@ -91,6 +91,8 @@ function editClicked(event){
         let newText = event.target.value;
         let currentJSON = traverseJSON(currentNoteStack);
 
+        let list = listItem.parentElement;
+
         /* Doesn't update text if new val is empty
             string or a key that already exists */
         if (event.keyCode == 13 && newText != "" &&
@@ -99,8 +101,8 @@ function editClicked(event){
 
             isSaved = false;
 
-            listItem.innerHTML = "";
-            listItem.appendChild(createNote(newText));
+            list.removeChild(listItem);
+            list.appendChild(createNote(newText));
 
             currentJSON[newText] = currentJSON[oldText];
             delete currentJSON[oldText];
@@ -119,7 +121,11 @@ function removeNote(note, noteNode){
         confirm("Are you sure you want to delete \"" + note + "\"?")){
         
         delete currentJSON[note];
-        noteNode.parentElement.parentElement.removeChild(noteNode.parentElement);
+
+        let listItem = noteNode.parentElement;
+        let list = listItem.parentElement;
+
+        list.removeChild(listItem);
         isSaved = false;
     }
 }
