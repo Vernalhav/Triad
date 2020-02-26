@@ -7,7 +7,10 @@ const NOTES_DIR = "notes";
 
 const app = express();
 
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "js")));
+app.use(express.static(path.join(__dirname, "css")));
+app.use(express.static(path.join(__dirname, "html")));
+app.use(express.static(path.join(__dirname, "assets")));
 
 
 const server = app.listen(8000);
