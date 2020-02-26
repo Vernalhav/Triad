@@ -7,7 +7,6 @@ let currentNoteStack = [];  // Path taken from root note to current note
 const FILENAME = "notes.json";
 const MSG_SUCCESS = "OK";
 const EDIT_ICON = "edit.png";
-const TOAST_DURATION = 5000;
 
 function main(){
     document.addEventListener("keydown", function(e){
