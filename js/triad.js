@@ -51,7 +51,6 @@ function createNote(note){
 
     let node = document.createElement("LI");
     let anchor = document.createElement("a");
-    let textNode = document.createTextNode(note);
     
     anchor.classList.add("note");
 
@@ -62,43 +61,51 @@ function createNote(note){
     editIcon.onclick = editClicked;
 
     anchor.href = "javascript:;";
+    anchor.innerText = note;
     anchor.onclick = textClicked;
     anchor.onmouseover = showEdit;
     anchor.onmouseout = hideEdit;
 
-    anchor.appendChild(textNode);
     node.appendChild(anchor);
-
     node.appendChild(editIcon);
+    
     return node;
 }
 
 
 function editClicked(event){
-    let oldValue = event.target.parentElement.getElementsByClassName("note")[0].innerText;
+    let oldText = event.target.parentElement.getElementsByClassName("note")[0].innerText;
     let listItem = event.target.parentElement;
+
+    console.log(listItem);
 
     let textBox = document.createElement("input");
     textBox.setAttribute("type", "text");
     textBox.setAttribute("size", "40");
-    textBox.setAttribute("value", oldValue);
-
-    textBox.onkeydown = function(event){
-        if (event.keyCode == 13 && event.target.value != ""){
-            isSaved = false;
-
-            let newText = event.target.value;
-            listItem.innerHTML = "";
-            listItem.appendChild(createNote(newText));
-
-            let currentJSON = traverseJSON(currentNoteStack);
-            currentJSON[newText] = currentJSON[oldValue];
-            delete currentJSON[oldValue];
-        }
-    };
+    textBox.setAttribute("value", oldText);
 
     listItem.innerHTML = "";
     listItem.appendChild(textBox);
+
+    textBox.onkeydown = function(event){
+        let newText = event.target.value;
+        let currentJSON = traverseJSON(currentNoteStack);
+
+        /* Doesn't update text if new val is empty
+            string or a key that already exists */
+        if (event.keyCode == 13 && newText != "" &&
+            (!currentJSON.hasOwnProperty(newText) ||
+            newText == oldText)){
+
+            isSaved = false;
+
+            listItem.innerHTML = "";
+            listItem.appendChild(createNote(newText));
+
+            currentJSON[newText] = currentJSON[oldText];
+            delete currentJSON[oldText];
+        }
+    };
 }
 
 
