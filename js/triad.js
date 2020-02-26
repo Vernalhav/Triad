@@ -7,7 +7,7 @@ let currentNoteStack = [];  // Path taken from root note to current note
 const FILENAME = "notes.json";
 const MSG_SUCCESS = "OK";
 const EDIT_ICON = "edit.png";
-
+const TOAST_DURATION = 5000;
 
 function main(){
     document.addEventListener("keydown", function(e){
@@ -18,6 +18,10 @@ function main(){
         }
     }, false);
 
+    setTimeout(()=>{
+        showToast("Tip: you can save your file with CTRL + S", 3000);
+    }, 1000);
+    
     requestNotes(FILENAME);
 }
 
@@ -83,7 +87,7 @@ function editClicked(event){
     textBox.onkeydown = function(event){
         if (event.keyCode == 13 && event.target.value != ""){
             isSaved = false;
-            
+
             let newText = event.target.value;
             listItem.innerHTML = "";
             listItem.appendChild(createNote(newText));
@@ -110,6 +114,7 @@ function removeNote(note, noteNode){
         
         delete currentJSON[note];
         noteNode.parentElement.parentElement.removeChild(noteNode.parentElement);
+        isSaved = false;
     }
 }
 
@@ -153,7 +158,7 @@ function saveFile(){
 
     sendJSON(requestJSON, ()=>{
         isSaved = true;
-        console.log("File saved.");
+        showToast("File saved.", 2000);
     });
 }
 
@@ -310,6 +315,22 @@ function hideEdit(event){
         let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
         editIcon.style.display = "";
     }, 300);
+}
+
+
+/* Sends a toast message for duration ms */
+function showToast(message, duration){
+    let body = document.getElementById("main_body");
+    let toast = document.createElement("div");
+
+    toast.classList.add("toast");
+    body.appendChild(toast);
+
+    toast.innerText = message;
+    toast.style = "--duration: " + duration + "ms;";
+    toast.classList.add("show");
+
+    setTimeout(()=>{body.removeChild(toast)}, duration);
 }
 
 
