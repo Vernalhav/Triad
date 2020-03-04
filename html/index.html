@@ -9,21 +9,23 @@
 </head>
 
 <body id="main_body">
-    <div style="margin-bottom:20px">
+    <div id="banner">
         <button onclick="toggleRemoving()">Remove</button>
         
         <input type="text" id="note_input" name="note" size=100 onkeydown="if (event.keyCode == 13) addNoteTextbox()">
     </div>
 
-    <div id="note_header">
-        <a href="javascript:;" onclick="backwardTraversal()" class="return" id="return_arrow"></a>
-        <a href="javascript:;" onclick="backwardTraversal()" class="return" id="previous_note">Notes</a>
-    </div>
+    <div id="content">
+        <div id="note_header">
+            <a href="javascript:;" onclick="backwardTraversal()" class="return" id="return_arrow"></a>
+            <a href="javascript:;" onclick="backwardTraversal()" class="return" id="previous_note">Notes</a>
+        </div>
 
-    <div class="notes">
-        <ul id="notes_list">
+        <div class="notes">
+            <ul id="notes_list">
 
-        </ul>
+            </ul>
+        </div>
     </div>
 </body>
 </html>

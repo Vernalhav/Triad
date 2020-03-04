@@ -1,16 +1,19 @@
 .toast {
+    min-width: 16%;
+    margin: auto;
+    left: 50%;
+    margin-left: -8%;
+    padding: 2%;
+
+    z-index: 1;
+    position: fixed; /* Sit on top of the screen */
+
     visibility: hidden;
-    min-width: 250px;
-    margin-left: -125px;
     background-color: #333;
     color: #fff; 
     text-align: center;
-    border-radius: 10px;
-    padding: 25px;
-    position: fixed; /* Sit on top of the screen */
-    left: 50%;
+    border-radius: 15px;
     bottom: -20%;
-    z-index: 1;
 }
 
 .toast.show {
@@ -56,11 +59,28 @@
     color: red !important;
 }
 
+#note_input {
+    border-radius: 10px;
+}
+
+#banner {
+    text-align: center;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    margin-bottom: 1%;
+    background-color: #e60b99;
+}
+
+#content {
+    margin: 0.5%;
+}
+
 a {
     text-decoration: none;
     color: black;
 }
 
 body {
+    margin: 0;
     background-color: #fff;
 }
