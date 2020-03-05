@@ -1,3 +1,5 @@
+<img src="./assets/triad.svg" height=50px align="center">
+
 This project aims to make it easier and more organized to take notes in a tree-like manner!  
   
   
