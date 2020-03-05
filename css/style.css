@@ -5,7 +5,7 @@
     margin-left: -8%;
     padding: 2%;
 
-    z-index: 1;
+    z-index: 2;
     position: fixed; /* Sit on top of the screen */
 
     visibility: hidden;
@@ -64,11 +64,20 @@
 }
 
 #banner {
+    min-width: 40%;
+    left: 50%;
+    margin-left: -20%;
+
+    border-radius: 40px;
+    padding: 1%;
+    padding-left: 2%;
+    padding-right: 2%;
+
+    align-items: center;
     text-align: center;
-    padding-top: 1%;
-    padding-bottom: 1%;
-    margin-bottom: 1%;
     background-color: #e60b99;
+    position: fixed;
+    z-index: 1;
 }
 
 #content {

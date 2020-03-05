@@ -8,6 +8,7 @@ const FILENAME = "notes.json";
 const MSG_SUCCESS = "OK";
 const EDIT_ICON = "edit.png";
 
+
 function main(){
     document.addEventListener("keydown", function(e){
         // Captures CTRL+S event
