@@ -30,7 +30,7 @@
 
 .return {
     font-family: Helvetica;
-    font-size: 40px; 
+    font-size: 3rem; 
     color: #555;
     white-space: normal;
     margin: 4px;
@@ -50,7 +50,7 @@
 
 .note {
     font-family: Helvetica;
-    font-size: 25px;
+    font-size: 1.5rem;
     color: black;
 
 }
@@ -60,6 +60,7 @@
 }
 
 #note_input {
+    width: 60%;
     border-radius: 10px;
 }
 
@@ -82,6 +83,12 @@
 
 #content {
     margin: 0.5%;
+}
+
+#logo {
+    margin: 0.5%;
+    margin-bottom: 2%;
+    width: 15%;
 }
 
 a {
