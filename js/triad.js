@@ -117,7 +117,7 @@ function editClicked(event){
         let newText = event.target.value;
         let currentJSON = traverseJSON(currentNoteStack);
 
-        let list = listItem.parentElement;
+        let list = listItem.closest("ul");
 
         /* Doesn't update text if new val is empty
             string or a key that already exists */
@@ -148,8 +148,8 @@ function removeNote(note, noteNode){
         
         delete currentJSON[note];
 
-        let listItem = noteNode.parentElement;
-        let list = listItem.parentElement;
+        let listItem = noteNode.closest("li");
+        let list = listItem.closest("ul");
 
         list.removeChild(listItem);
         isSaved = false;
