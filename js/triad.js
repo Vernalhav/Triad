@@ -6,7 +6,19 @@ let currentNoteStack = [];  // Path taken from root note to current note
 
 const FILENAME = "notes.json";
 const MSG_SUCCESS = "OK";
-const EDIT_ICON = "edit.png";
+
+const ACTIONS = {
+    "edit" : {
+        "iconPath" : "edit.png",
+        "onclick" : editClicked
+    },
+    "remove" : {
+        "iconPath" : "remove.png",
+        "onclick" : removeClicked
+    }
+};
+
+const ACTIONS_DELAY = 300;
 
 
 function main(){
@@ -26,7 +38,7 @@ function main(){
 }
 
 
-/* Adds non-empty string as a note */
+/* Adds non-empty string to the DOM */
 function addNote(note){
     if (note == "") return;
 
@@ -46,7 +58,8 @@ function addNote(note){
 /*
     Returns HTML element to be appended
     to the notes list as a <li> with text
-    as the string 'note'
+    as the string 'note' with the corres-
+    ponding edit/remove icons.
 */
 function createNote(note){
 
@@ -55,28 +68,39 @@ function createNote(note){
     
     anchor.classList.add("note");
 
-    let editIcon = document.createElement("img");
-
-    editIcon.src = EDIT_ICON;
-    editIcon.classList.add("edit");
-    editIcon.onclick = editClicked;
-
     anchor.href = "javascript:;";
     anchor.innerText = note;
     anchor.onclick = textClicked;
-    anchor.onmouseover = showEdit;
-    anchor.onmouseout = hideEdit;
+    anchor.onmouseover = showActions;
+    anchor.onmouseout = hideActions;
+    
+    let actionsDiv = document.createElement("div");
+    actionsDiv.className = "actions";
+
+    for (let action in ACTIONS){
+        let actionIcon = document.createElement("img");
+        actionIcon.src = ACTIONS[action].iconPath;
+        actionIcon.classList.add(action);
+        actionIcon.classList.add("action");
+        actionIcon.onclick = ACTIONS[action].onclick;
+        actionsDiv.appendChild(actionIcon);
+    }
 
     node.appendChild(anchor);
-    node.appendChild(editIcon);
+    node.appendChild(actionsDiv);
 
     return node;
 }
 
 
+function removeClicked(event){
+    console.log(event.target);
+}
+
+
 function editClicked(event){
-    let oldText = event.target.parentElement.getElementsByClassName("note")[0].innerText;
-    let listItem = event.target.parentElement;
+    let listItem = event.target.parentElement.parentElement; 
+    let oldText = listItem.getElementsByClassName("note")[0].innerText;
 
     let textBox = document.createElement("input");
     textBox.setAttribute("type", "text");
@@ -311,21 +335,21 @@ function displayNotes(json){
 }
 
 
-/* Shows edit icon on note hover */
-function showEdit(event){
+/* Shows available actions on note hover */
+function showActions(event){
     if (removing) return;
-
-    let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
-    editIcon.style.display = "inline-block";
+    
+    let actionsDiv = event.target.parentElement.getElementsByClassName("actions")[0];
+    actionsDiv.style.display = "inline-block";
 }
 
 
-/* Hides edit icon after brief delay */
-function hideEdit(event){
+/* Hides available actions after brief delay */
+function hideActions(event){
     setTimeout(()=>{
-        let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
-        editIcon.style.display = "";
-    }, 300);
+        let actionsDiv = event.target.parentElement.getElementsByClassName("actions")[0];
+        actionsDiv.style.display = "";
+    }, ACTIONS_DELAY);
 }
 
 
