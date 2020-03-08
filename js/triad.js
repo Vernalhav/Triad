@@ -78,12 +78,10 @@ function editClicked(event){
     let oldText = event.target.parentElement.getElementsByClassName("note")[0].innerText;
     let listItem = event.target.parentElement;
 
-    console.log(listItem);
-
     let textBox = document.createElement("input");
     textBox.setAttribute("type", "text");
-    textBox.setAttribute("size", "40");
     textBox.setAttribute("value", oldText);
+    textBox.className = "edit_text";
 
     listItem.innerHTML = "";
     listItem.appendChild(textBox);

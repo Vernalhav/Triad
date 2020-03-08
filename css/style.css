@@ -1,3 +1,7 @@
+:root {
+    --theme-color: #e60b99;
+}
+
 .toast {
     min-width: 16%;
     margin: auto;
@@ -52,16 +56,31 @@
     font-family: Helvetica;
     font-size: 1.5rem;
     color: black;
-
 }
 
 .removing {
     color: red !important;
 }
 
+.edit_text {
+    size: 10%;
+    font-size: 1.5rem;
+}
+
 #note_input {
+    padding: 0.5%;
+    padding-left: 1.5%;
+    padding-right: 1.5%;
+    border: none;
     width: 60%;
     border-radius: 10px;
+}
+
+#remove_button {
+    border: none;
+    color: var(--theme-color);
+    border-radius: 100%;
+    background-color: white;
 }
 
 #banner {
@@ -76,7 +95,7 @@
 
     align-items: center;
     text-align: center;
-    background-color: #e60b99;
+    background-color: var(--theme-color);
     position: fixed;
     z-index: 1;
 }
@@ -94,6 +113,11 @@
 a {
     text-decoration: none;
     color: black;
+}
+
+li {
+    margin-top: 1%;
+    margin-bottom: 1%;
 }
 
 body {
