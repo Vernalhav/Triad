@@ -96,11 +96,6 @@ function createNote(note){
 }
 
 
-function removeClicked(event){
-    console.log(event.target);
-}
-
-
 function editClicked(event){
     let listItem = event.target.closest("li"); 
     let oldText = listItem.getElementsByClassName("note")[0].innerText;
@@ -137,9 +132,22 @@ function editClicked(event){
 }
 
 
-/* Removes note from JSON and HTML */
-function removeNote(note, noteNode){
+function removeClicked(event){
+    let listItem = event.target.closest("li");
+    let noteNode = listItem.getElementsByClassName("note")[0];
+
+    removeNote(noteNode);
+}
+
+
+/*
+    Removes note from JSON and DOM
+    noteNode:   HTML element whose
+                innerText is the note
+*/
+function removeNote(noteNode){
     let currentJSON = traverseJSON(currentNoteStack);
+    let note = noteNode.innerText;
 
     if (!currentJSON.hasOwnProperty(note)) return;
 
@@ -204,14 +212,7 @@ function saveFile(){
 function textClicked(event){
     let textNode = event.target;
     let text = textNode.innerText;
-
-    if (textNode.classList.contains("removing")){
-        removeNote(text, textNode);
-    } else if (textNode.classList.contains("reordering")){
-        console.log("NOT IMPLEMENTED");
-    } else {
-        forwardTraversal(text);
-    }
+    forwardTraversal(text);
 }
 
 
@@ -250,8 +251,7 @@ function backwardTraversal(){
     if (currentNoteStack.length != 0){
         noteParentText = currentNoteStack[currentNoteStack.length - 1];
         document.getElementById("return_arrow").innerText = "<";
-    }
-    else {
+    } else {
         noteParentText = "Notes";
         document.getElementById("return_arrow").innerText = "";
     }
@@ -283,26 +283,6 @@ function traverseJSON(path, json=notesJSON){
     }
 
     return traverseResult;
-}
-
-
-/*
-    Changes each list element's class
-    to identify whether or not it is
-    being removed.
-*/
-function toggleRemoving(){
-    removing = !removing;
-
-    let anchorList = document.querySelectorAll(".note");
-
-    if (removing){
-        for (let i = 0; i < anchorList.length; i++)
-            anchorList[i].classList.add("removing");
-    } else {
-        for (let i = 0; i < anchorList.length; i++)
-            anchorList[i].classList.remove("removing");
-    }
 }
 
 
