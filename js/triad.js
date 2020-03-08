@@ -7,6 +7,7 @@ let currentNoteStack = [];  // Path taken from root note to current note
 const FILENAME = "notes.json";
 const MSG_SUCCESS = "OK";
 
+// Edit this macro to add more actions to the note hover sidebar
 const ACTIONS = {
     "edit" : {
         "iconPath" : "edit.png",
@@ -58,8 +59,8 @@ function addNote(note){
 /*
     Returns HTML element to be appended
     to the notes list as a <li> with text
-    as the string 'note' with the corres-
-    ponding edit/remove icons.
+    as the string 'note' and the corres-
+    ponding action icons.
 */
 function createNote(note){
 
@@ -79,10 +80,12 @@ function createNote(note){
 
     for (let action in ACTIONS){
         let actionIcon = document.createElement("img");
+
         actionIcon.src = ACTIONS[action].iconPath;
-        actionIcon.classList.add(action);
-        actionIcon.classList.add("action");
         actionIcon.onclick = ACTIONS[action].onclick;
+        actionIcon.classList.add(action);   // adds custom class for each action. Might be useful later
+        actionIcon.classList.add("action");
+        
         actionsDiv.appendChild(actionIcon);
     }
 
@@ -99,7 +102,7 @@ function removeClicked(event){
 
 
 function editClicked(event){
-    let listItem = event.target.parentElement.parentElement; 
+    let listItem = event.target.closest("li"); 
     let oldText = listItem.getElementsByClassName("note")[0].innerText;
 
     let textBox = document.createElement("input");
