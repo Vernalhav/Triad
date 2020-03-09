@@ -19,7 +19,7 @@ const ACTIONS = {
     }
 };
 
-const ACTIONS_DELAY = 300;
+const ACTIONS_DELAY = 300;  // Time in ms before hovered actions disappear
 
 
 function main(){
@@ -185,7 +185,7 @@ function requestNotes(name=FILENAME){
 
         Object.assign(notesJSON, response.file);
 
-        displayNotes(notesJSON);
+        displayNotes(notesJSON, "Notes", returnArrow=false);
     });
 }
 
@@ -226,13 +226,10 @@ function forwardTraversal(note){
     currentNoteStack.push(note);
     let noteChildren = traverseJSON(currentNoteStack);
 
-    if (noteChildren != null){
-        document.getElementById("previous_note").innerText = note;
-        document.getElementById("return_arrow").innerText = "<";
-        displayNotes(noteChildren);
-    } else {
+    if (noteChildren != null)
+        displayNotes(noteChildren, note, returnArrow=true);
+    else
         currentNoteStack.pop(); // Undoes invalid operation
-    }
 }
 
 
@@ -248,20 +245,18 @@ function backwardTraversal(){
     let noteParent = traverseJSON(currentNoteStack);
 
     let noteParentText = "";
-    if (currentNoteStack.length != 0){
+    let displayArrow = true;
+    if (currentNoteStack.length != 0)
         noteParentText = currentNoteStack[currentNoteStack.length - 1];
-        document.getElementById("return_arrow").innerText = "<";
-    } else {
+    else {
         noteParentText = "Notes";
-        document.getElementById("return_arrow").innerText = "";
+        displayArrow = false;
     }
 
-    if (noteParent != null){
-        document.getElementById("previous_note").innerText = noteParentText;
-        displayNotes(noteParent);
-    } else {
+    if (noteParent != null)
+        displayNotes(noteParent, noteParentText, returnArrow=displayArrow);
+    else
         currentNoteStack.push(note);    // Undoes invalid operation
-    }
 }
 
 
@@ -305,11 +300,17 @@ function addNoteTextbox(){
     the notes from the json keys.
 
     json: json file whose keys are notes
+    previousText: text to display at the top
+    returnArrow: whether to add a return
+                 arrow to the top label
 */
-function displayNotes(json){
+function displayNotes(json, previousText, returnArrow=true){
 
     let notesList = document.getElementById("notes_list");
-     
+    
+    document.getElementById("previous_note").innerText = previousText;
+    document.getElementById("return_arrow").innerText = returnArrow ? "<" : "";
+
     while (notesList.hasChildNodes())
         notesList.removeChild(notesList.childNodes[0]);
 
@@ -349,6 +350,13 @@ function showToast(message, duration){
     toast.classList.add("show");
 
     setTimeout(()=>{body.removeChild(toast)}, duration);
+}
+
+
+function returnHome(){
+    currentNoteStack = [];
+    currentJSON = traverseJSON(currentNoteStack);
+    displayNotes(currentJSON, "Notes", returnArrow=false);
 }
 
 
