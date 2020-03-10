@@ -1,29 +1,33 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en-US">
 <head>
     <meta charset="utf-8">
+    <title>triad</title>
     <!-- Linking external CSS and JS files -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="triad_icon.svg">
+    <link media="screen" rel="stylesheet" href="style.css">
     <script type="text/javascript" src="triad.js"></script>
 </head>
 
 <body id="main_body">
-    <div style="margin-bottom:20px">
-        <button onclick="toggleRemoving()">Remove</button>
-        
-        <input type="text" id="note_input" name="note" size=100 onkeydown="if (event.keyCode == 13) addNoteTextbox()">
+    <div id="banner">
+        <input type="text" id="note_input" name="note" onkeydown="if (event.keyCode == 13) addNoteTextbox()">
     </div>
 
-    <div id="note_header">
-        <a href="javascript:;" onclick="backwardTraversal()" class="return" id="return_arrow"></a>
-        <a href="javascript:;" onclick="backwardTraversal()" class="return" id="previous_note">Notes</a>
-    </div>
+    <div id="content">
+        <img src="triad.svg" id="logo" alt="triad" onclick="returnHome()">
 
-    <div class="notes">
-        <ul id="notes_list">
+        <div id="note_header">
+            <a href="javascript:;" onclick="backwardTraversal()" class="return" id="return_arrow"></a>
+            <a href="javascript:;" onclick="backwardTraversal()" class="return" id="previous_note">Notes</a>
+        </div>
 
-        </ul>
+        <div class="notes">
+            <ul id="notes_list">
+
+            </ul>
+        </div>
     </div>
 </body>
 </html>

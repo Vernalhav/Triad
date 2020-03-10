@@ -6,7 +6,21 @@ let currentNoteStack = [];  // Path taken from root note to current note
 
 const FILENAME = "notes.json";
 const MSG_SUCCESS = "OK";
-const EDIT_ICON = "edit.png";
+
+// Edit this macro to add more actions to the note hover sidebar
+const ACTIONS = {
+    "edit" : {
+        "iconPath" : "edit.png",
+        "onclick" : editClicked
+    },
+    "remove" : {
+        "iconPath" : "remove.png",
+        "onclick" : removeClicked
+    }
+};
+
+const ACTIONS_DELAY = 300;  // Time in ms before hovered actions disappear
+
 
 function main(){
     document.addEventListener("keydown", function(e){
@@ -25,7 +39,7 @@ function main(){
 }
 
 
-/* Adds non-empty string as a note */
+/* Adds non-empty string to the DOM */
 function addNote(note){
     if (note == "") return;
 
@@ -45,7 +59,8 @@ function addNote(note){
 /*
     Returns HTML element to be appended
     to the notes list as a <li> with text
-    as the string 'note'
+    as the string 'note' and the corres-
+    ponding action icons.
 */
 function createNote(note){
 
@@ -54,35 +69,41 @@ function createNote(note){
     
     anchor.classList.add("note");
 
-    let editIcon = document.createElement("img");
-
-    editIcon.src = EDIT_ICON;
-    editIcon.classList.add("edit");
-    editIcon.onclick = editClicked;
-
     anchor.href = "javascript:;";
     anchor.innerText = note;
     anchor.onclick = textClicked;
-    anchor.onmouseover = showEdit;
-    anchor.onmouseout = hideEdit;
+    anchor.onmouseover = showActions;
+    anchor.onmouseout = hideActions;
+    
+    let actionsDiv = document.createElement("div");
+    actionsDiv.className = "actions";
+
+    for (let action in ACTIONS){
+        let actionIcon = document.createElement("img");
+
+        actionIcon.src = ACTIONS[action].iconPath;
+        actionIcon.onclick = ACTIONS[action].onclick;
+        actionIcon.classList.add(action);   // adds custom class for each action. Might be useful later
+        actionIcon.classList.add("action");
+        
+        actionsDiv.appendChild(actionIcon);
+    }
 
     node.appendChild(anchor);
-    node.appendChild(editIcon);
+    node.appendChild(actionsDiv);
 
     return node;
 }
 
 
 function editClicked(event){
-    let oldText = event.target.parentElement.getElementsByClassName("note")[0].innerText;
-    let listItem = event.target.parentElement;
-
-    console.log(listItem);
+    let listItem = event.target.closest("li"); 
+    let oldText = listItem.getElementsByClassName("note")[0].innerText;
 
     let textBox = document.createElement("input");
     textBox.setAttribute("type", "text");
-    textBox.setAttribute("size", "40");
     textBox.setAttribute("value", oldText);
+    textBox.className = "edit_text";
 
     listItem.innerHTML = "";
     listItem.appendChild(textBox);
@@ -91,7 +112,7 @@ function editClicked(event){
         let newText = event.target.value;
         let currentJSON = traverseJSON(currentNoteStack);
 
-        let list = listItem.parentElement;
+        let list = listItem.closest("ul");
 
         /* Doesn't update text if new val is empty
             string or a key that already exists */
@@ -111,9 +132,22 @@ function editClicked(event){
 }
 
 
-/* Removes note from JSON and HTML */
-function removeNote(note, noteNode){
+function removeClicked(event){
+    let listItem = event.target.closest("li");
+    let noteNode = listItem.getElementsByClassName("note")[0];
+
+    removeNote(noteNode);
+}
+
+
+/*
+    Removes note from JSON and DOM
+    noteNode:   HTML element whose
+                innerText is the note
+*/
+function removeNote(noteNode){
     let currentJSON = traverseJSON(currentNoteStack);
+    let note = noteNode.innerText;
 
     if (!currentJSON.hasOwnProperty(note)) return;
 
@@ -122,8 +156,8 @@ function removeNote(note, noteNode){
         
         delete currentJSON[note];
 
-        let listItem = noteNode.parentElement;
-        let list = listItem.parentElement;
+        let listItem = noteNode.closest("li");
+        let list = listItem.closest("ul");
 
         list.removeChild(listItem);
         isSaved = false;
@@ -151,7 +185,7 @@ function requestNotes(name=FILENAME){
 
         Object.assign(notesJSON, response.file);
 
-        displayNotes(notesJSON);
+        displayNotes(notesJSON, "Notes", returnArrow=false);
     });
 }
 
@@ -178,14 +212,7 @@ function saveFile(){
 function textClicked(event){
     let textNode = event.target;
     let text = textNode.innerText;
-
-    if (textNode.classList.contains("removing")){
-        removeNote(text, textNode);
-    } else if (textNode.classList.contains("reordering")){
-        console.log("NOT IMPLEMENTED");
-    } else {
-        forwardTraversal(text);
-    }
+    forwardTraversal(text);
 }
 
 
@@ -199,13 +226,10 @@ function forwardTraversal(note){
     currentNoteStack.push(note);
     let noteChildren = traverseJSON(currentNoteStack);
 
-    if (noteChildren != null){
-        document.getElementById("previous_note").innerText = note;
-        document.getElementById("return_arrow").innerText = "<";
-        displayNotes(noteChildren);
-    } else {
+    if (noteChildren != null)
+        displayNotes(noteChildren, note, returnArrow=true);
+    else
         currentNoteStack.pop(); // Undoes invalid operation
-    }
 }
 
 
@@ -221,21 +245,18 @@ function backwardTraversal(){
     let noteParent = traverseJSON(currentNoteStack);
 
     let noteParentText = "";
-    if (currentNoteStack.length != 0){
+    let displayArrow = true;
+    if (currentNoteStack.length != 0)
         noteParentText = currentNoteStack[currentNoteStack.length - 1];
-        document.getElementById("return_arrow").innerText = "<";
-    }
     else {
         noteParentText = "Notes";
-        document.getElementById("return_arrow").innerText = "";
+        displayArrow = false;
     }
 
-    if (noteParent != null){
-        document.getElementById("previous_note").innerText = noteParentText;
-        displayNotes(noteParent);
-    } else {
+    if (noteParent != null)
+        displayNotes(noteParent, noteParentText, returnArrow=displayArrow);
+    else
         currentNoteStack.push(note);    // Undoes invalid operation
-    }
 }
 
 
@@ -260,26 +281,6 @@ function traverseJSON(path, json=notesJSON){
 }
 
 
-/*
-    Changes each list element's class
-    to identify whether or not it is
-    being removed.
-*/
-function toggleRemoving(){
-    removing = !removing;
-
-    let anchorList = document.querySelectorAll(".note");
-
-    if (removing){
-        for (let i = 0; i < anchorList.length; i++)
-            anchorList[i].classList.add("removing");
-    } else {
-        for (let i = 0; i < anchorList.length; i++)
-            anchorList[i].classList.remove("removing");
-    }
-}
-
-
 /* Adds user input as a note */
 function addNoteTextbox(){
     let text = document.getElementById("note_input").value;
@@ -299,11 +300,17 @@ function addNoteTextbox(){
     the notes from the json keys.
 
     json: json file whose keys are notes
+    previousText: text to display at the top
+    returnArrow: whether to add a return
+                 arrow to the top label
 */
-function displayNotes(json){
+function displayNotes(json, previousText, returnArrow=true){
 
     let notesList = document.getElementById("notes_list");
-     
+    
+    document.getElementById("previous_note").innerText = previousText;
+    document.getElementById("return_arrow").innerText = returnArrow ? "<" : "";
+
     while (notesList.hasChildNodes())
         notesList.removeChild(notesList.childNodes[0]);
 
@@ -312,21 +319,21 @@ function displayNotes(json){
 }
 
 
-/* Shows edit icon on note hover */
-function showEdit(event){
+/* Shows available actions on note hover */
+function showActions(event){
     if (removing) return;
-
-    let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
-    editIcon.style.display = "inline-block";
+    
+    let actionsDiv = event.target.parentElement.getElementsByClassName("actions")[0];
+    actionsDiv.style.display = "inline-block";
 }
 
 
-/* Hides edit icon after brief delay */
-function hideEdit(event){
+/* Hides available actions after brief delay */
+function hideActions(event){
     setTimeout(()=>{
-        let editIcon = event.target.parentElement.getElementsByClassName("edit")[0];
-        editIcon.style.display = "";
-    }, 300);
+        let actionsDiv = event.target.parentElement.getElementsByClassName("actions")[0];
+        actionsDiv.style.display = "";
+    }, ACTIONS_DELAY);
 }
 
 
@@ -343,6 +350,13 @@ function showToast(message, duration){
     toast.classList.add("show");
 
     setTimeout(()=>{body.removeChild(toast)}, duration);
+}
+
+
+function returnHome(){
+    currentNoteStack = [];
+    currentJSON = traverseJSON(currentNoteStack);
+    displayNotes(currentJSON, "Notes", returnArrow=false);
 }
 
 
