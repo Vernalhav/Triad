@@ -183,7 +183,7 @@ function requestNotes(name=FILENAME){
         let response = JSON.parse(event.target.response);
         if (response.status != MSG_SUCCESS) return;
 
-        Object.assign(notesJSON, response.file);
+        Object.assign(notesJSON, response.return);
 
         displayNotes(notesJSON, "Notes", returnArrow=false);
     });

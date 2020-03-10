@@ -7,6 +7,7 @@ const NOTES_DIR = "notes";
 
 const app = express();
 
+/* Expose all public directories */
 app.use(express.static(path.join(__dirname, "js")));
 app.use(express.static(path.join(__dirname, "css")));
 app.use(express.static(path.join(__dirname, "html")));
@@ -52,13 +53,13 @@ app.post("/", function (request, response){
 
     args: JSON object that must have
           the following keys:
-    - name: string with the file name
-    - json: JSON object
+        - name: string with the file name
+        - json: JSON object
     response: response object to send to the client.
 
-    The response object should
+    The response object will
     contain the following keys:
-    - status: message indicating success or failure 
+        - status: message indicating success (MSG_SUCCESS) or failure 
 */
 function saveFile(args, response){
     if (!hasProperties(args, ["name", "json"])){        
@@ -93,17 +94,58 @@ function saveFile(args, response){
 
 
 /*
+    Sends array with all
+    note file names 
+
+    args: JSON object that must have
+          the following keys:
+          - user: string with the username
+    response: response object to send to the client
+
+    The response object will
+    contain the following keys:
+        - status: message indicating success (MSG_SUCCESS) or failure
+        - return: array with strings containing all file names without extension
+*/
+function getFileNames(args, response){
+    
+    fs.readdir(NOTES_DIR, function(error, files){
+        if (error){
+            response.json({
+                "status" : "Could not read files directory",
+                "return" : null
+            });
+            return;
+        }
+
+        let returnArray = [];
+        files.forEach(function (file){
+            returnArray.push(file.split('.')[0]);
+        });
+
+        response.JSON({
+            "status" : MSG_SUCCESS,
+            "return" : returnArray
+        });
+
+        return;
+    });
+
+}
+
+
+/*
     Sends notes JSON
     
     args: JSON object that must have
           the following keys:
-    - name: string with the file name
+        - name: string with the file name
     response: response object to send to the client.
     
     The response object should
     contain the following keys:
-    - status: message indicating success (MSG_SUCCESS) or failure 
-    - file:   the relevant file in JSON format
+        - status: message indicating success (MSG_SUCCESS) or failure 
+        - return: the relevant file in JSON format
 */
 function getFile(args, response){
     if (!hasProperties(args, ["name"])){
@@ -121,7 +163,7 @@ function getFile(args, response){
         let fileJSON = JSON.parse(data);
         response.json({
             "status" : MSG_SUCCESS,
-            "file" : fileJSON
+            "return" : fileJSON
         });
     });
 }

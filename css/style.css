@@ -114,6 +114,30 @@
     cursor: pointer;
 }
 
+#homepage_logo {
+    position: relative;
+    width: 15%;
+    left: 50%;
+    margin-left: -7.5%;
+    margin-top: 10%;
+}
+
+#homepage_box {
+    position: relative;
+    left: 50%;
+    margin-left: -10%;
+    margin-top: 3%;
+
+    background-color: var(--theme-color);
+    border-radius: 20px;
+    width: 20%;
+    height: 20%;
+}
+
+.homepage_box_item {
+
+}
+
 a {
     text-decoration: none;
     color: black;
