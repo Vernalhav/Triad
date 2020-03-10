@@ -124,18 +124,33 @@
 
 #homepage_box {
     position: relative;
-    left: 50%;
-    margin-left: -10%;
     margin-top: 3%;
+
+    padding: 1%;
+
+    left: 50%;
+    margin-left: -12.5%;
+
+    width: 25%;
+    height: 10vh;
 
     background-color: var(--theme-color);
     border-radius: 20px;
-    width: 20%;
-    height: 20%;
 }
 
 .homepage_box_item {
+    position: relative;
 
+    left: 50%;
+    margin-left: -45%;
+
+    width: 90%;
+    height: 50%;
+
+    background-color: #fff;
+    border-radius: 20px;
+
+    text-align: center;
 }
 
 a {
